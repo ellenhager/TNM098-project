@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="d3.slider.css" />  
+
+<style>
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative;
+  width: 1300px;
+}
+#map{
+  background-color: black;
+  height: 601.5px;
+  width: 606px;
+  float:left;
+  padding:5px;
+  position:static
+}
+#bar{
+  background-color: white;
+  height:601.5px;
+  width: 300px;
+  float:right;
+  padding:5px;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.bar {
+  fill: steelblue;
+  fill-opacity: .9;
+}
+
+.x.axis path {
+  display: none;
+}
+div.tooltip { 
+    position: absolute;     
+    text-align: center;     
+    width: 60px;          
+    height: 28px;         
+    padding: 1px;       
+    font: 10px sans-serif;    
+    background: lightsteelblue; 
+    border: 2px;    
+    border-radius: 8px;     
+    pointer-events: none;     
+}
+#sliderTime
+{
+	width: 500px;
+	height: 10px;
+	margin: 10px;
+	margin-right: 60px;
+	padding: 0;
+	float: right;
+}
+
+label {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.x.axis path{
+	display: none;
+}
+
+</style>
+<link rel="stylesheet" type="text/css" href="d3.slider.css" media="screen" />
+
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="d3.v3.min.js"></script>
+<script src="d3.slider.js"></script>
+
+<div id="map" align="left"></div>
+<h2 align="center">Time: <span id="timeMin">8:00 - 8:59</span></h2>
+    <div id="sliderTime"> </div>
+<div id="chart"></div>
+
+<script>
+var attractions = [];
+var attractionCounter = [];
+var sliderTime = d3.slider();
+
+var div = d3.select("body").append("div") 
+    .attr("class", "tooltip")       
+    .style("opacity", 0);	
+	
+loadCSV("data/friday/8.csv");
+function loadCSV(file)
+{
+  attractions = [];
+  attractionCounter = [];
+  console.log(file);
+
+  d3.csv(file, function(error, data) 
+  {
+    if (error) throw error;
+
+    data.forEach(function(d) 
+    {
+      if(d.type == "check-in")
+      {	  
+        var newLocation = [+d["X"], +d["Y"]];
+        var check = false;
+
+        for(var i = 0; i < attractions.length; i++ )
+        {
+
+          if(attractions[i][0] == newLocation[0] && attractions[i][1] == newLocation[1])
+          {
+            check = true;
+            attractionCounter[i] +=1;
+            break;
+          }
+        }
+        if(!check)
+        {
+		  switch(newLocation[0] + "|" + newLocation[1])
+		  {
+			case "0|67":
+				newLocation.push(49);
+				newLocation.push("Raptor Restroom");
+				break;
+			case "47|11":
+				newLocation.push(1);
+				newLocation.push("Wrightiraptor Mountain");
+				break;
+			case "99|77":
+				newLocation.push(0);
+				newLocation.push("Entry Corridor");
+				break;
+			case "78|48":
+				newLocation.push(4);
+				newLocation.push("TerrorSaur");
+				break;
+			case "86|44":
+				newLocation.push(6);
+				newLocation.push("Keimosaurus Big Spin");
+				break;
+			case "69|44":
+				newLocation.push(81);
+				newLocation.push("Flight of the Swingodon");
+				break;
+			case "17|67":
+				newLocation.push(22);
+				newLocation.push("Jurassic Road");
+				break;
+			case "6|43":
+				newLocation.push(20);
+				newLocation.push("Scholtz Express");
+				break;
+			case "76|88":
+				newLocation.push(14);
+				newLocation.push("Beelzebufo");
+				break;
+			case "32|33":
+				newLocation.push(32);
+				newLocation.push("Creighton Pavilion");
+				break;
+			case "87|48":
+				newLocation.push(29);
+				newLocation.push("Dykesadactyl Thrill");
+				break;
+			case "16|66":
+				newLocation.push(5);
+				newLocation.push("Wandisaurus Chase");
+				break;
+			case "87|63":
+				newLocation.push(64);
+				newLocation.push("Sabretooth Theatre");
+				break;
+			case "60|37":
+				newLocation.push(100);
+				newLocation.push("Greens");
+				break;
+			case "26|59":
+				newLocation.push(25);
+				newLocation.push("Maiasaur Madness");
+				break;
+			case "17|43":
+				newLocation.push(7);
+				newLocation.push("Firefall");
+				break;
+			case "87|81":
+				newLocation.push(19);
+				newLocation.push("Stone Cups");
+				break;
+			case "45|24":
+				newLocation.push(8);
+				newLocation.push("Atmosfear");
+				break;
+			case "78|37":
+				newLocation.push(30);
+				newLocation.push("Ichthyoroberts Rapids");
+				break;
+			case "79|87":
+				newLocation.push(13);
+				newLocation.push("Cyndisaurus Asteroid");
+				break;
+			case "23|54":
+				newLocation.push(28);
+				newLocation.push("Eberlesaurus Roundup");
+				break;
+			case "38|90":
+				newLocation.push(3);
+				newLocation.push("Auvilotops Express");
+				break;
+			case "83|88":
+				newLocation.push(17);
+				newLocation.push("Blur Iguanodon");
+				break;
+			case "73|84":
+				newLocation.push(12);
+				newLocation.push("Flying Tyrandrienkos");
+				break;
+			case "79|89":
+				newLocation.push(15);
+				newLocation.push("Enchanted Toadstools");
+				break;
+			case "92|81":
+				newLocation.push(9);
+				newLocation.push("North Line");
+				break;
+			case "28|66":
+				newLocation.push(26);
+				newLocation.push("Kristanodon Kaper");
+				break;
+			case "81|77":
+				newLocation.push(10);
+				newLocation.push("Jeredactyl Jump");
+				break;
+			case "43|78":
+				newLocation.push(31);
+				newLocation.push("Raptor Race");
+				break;
+			case "85|86":
+				newLocation.push(18);
+				newLocation.push("Wild Jungle Cruise");
+				break;
+			case "27|15":
+				newLocation.push(2);
+				newLocation.push("Galactosaurus Rage");
+				break;
+			case "82|80":
+				newLocation.push(16);
+				newLocation.push("Stegocycles");
+				break;
+			case "48|87":
+				newLocation.push(27);
+				newLocation.push("Squidosaur");
+				break;
+			case "67|37":
+				newLocation.push(100);
+				newLocation.push("Greens");
+				break;
+			case "73|79":
+				newLocation.push(11);
+				newLocation.push("Sauroma Bumpers");
+				break;
+			case "42|37":
+				newLocation.push(100);
+				newLocation.push("Greens");
+				break;
+			case "34|68":
+				newLocation.push(21);
+				newLocation.push("Paleocarrie Carousel");
+				break;
+			case "16|49":
+				newLocation.push(23);
+				newLocation.push("Rhynasaurus");
+				break;
+			case "43|56":
+				newLocation.push(24);
+				newLocation.push("Kauf's Lost Canyon Escape");
+				break;
+			case "63|99":
+				newLocation.push(0);
+				newLocation.push("Enterance/Exit");
+				break;
+			case "50|57":
+				newLocation.push(62);
+				newLocation.push("Liggement Fix-Me-Up");
+				break;
+			case "76|22":
+				newLocation.push(63);
+				newLocation.push("Grinosaurus");
+				break;
+			default:
+				console.log("Finns inget alternativ för" + newLocation[0] + "|" + newLocation[1]);
+				break;	
+		  }
+          attractions.push(newLocation);
+          attractionCounter.push(1);
+        }
+      }
+    });
+    plotDots();
+	refreshGraph();
+  });
+}
+			
+function plotDots()
+{
+  var size = d3.scale.linear()
+    .range([3, 20])
+    .domain([0, d3.max(attractionCounter)]);
+
+  var colours = ['#00FF00', '#12FF00', '#24FF00',
+     '#47FF00', '#58FF00' , '#6AFF00' ,
+     '#7CFF00', '#8DFF00' , '#9FFF00' ,
+     '#B0FF00', '#C2FF00' , '#D4FF00' ,
+     '#E5FF00', '#F7FF00' , '#FFF600' ,
+     '#FFE400', '#FFD300' , '#FFC100' ,
+     '#FFAF00', '#FF9E00' , '#FF8C00' ,
+     '#FF7B00', '#FF6900' , '#FF5700' ,
+     '#FF4600', '#FF3400' , '#FF2300' ,
+     '#FF1100', '#FF0000' , '#FF0000' ,
+     '#FF0000'];
+
+  var heatmapColour = d3.scale.linear()
+  .domain(d3.range(0, 1, 1.0 / (colours.length - 1)))
+  .range(colours);
+
+  var c = d3.scale.linear().domain(d3.extent(attractionCounter)).range([0,1]);
+
+  svg.selectAll(".dot").remove();
+
+    svg.selectAll(".dot")
+        .data(attractions)
+        .enter().append("circle")
+        .attr("class", "dot")
+        .attr("cx", function(d) { return d[0] * 6; })
+        .attr("cy", function(d) { return 601 - (d[1] * 6); })
+		.on("mouseover", function(d, i) 
+        {
+			//Hoover color dot
+			d3.select(this)
+				.style("fill", "blue")
+				.style("opacity", .9)
+				.style("stroke", "black");
+				
+
+				
+			//Linked color bar
+			d3.selectAll("rect")
+				.filter(function(d) {return d.name == attractions[i][3];})
+				.style("fill", "blue")
+				.style("opacity", .9)
+				
+            var name = attractions[i][3];
+            console.log(name);
+            div.transition()    
+                .duration(200)    
+                .style("opacity", .9);    
+            div .html(name)  
+                .style("left", (d3.event.pageX) + "px")   
+                .style("top", (d3.event.pageY - 28) + "px");  
+            })          
+        .on("mouseout", function() 
+        {   
+			//Return color
+			d3.select(this)
+				.style("fill", function(d, i) { return heatmapColour(c(d)) });
+				
+			//Return color for bars
+			d3.selectAll("rect")
+				.style("fill", function(d) { return heatmapColour(c(d.value)) });
+				
+            div.transition()    
+                .duration(500)    
+                .style("opacity", 0); 
+        })
+        .style("stroke", "black")
+		.style("opacity", 0.8);
+
+    svg.selectAll(".dot")
+        .data(attractionCounter)
+        .attr("fill", function(d) { return heatmapColour(c(d)) })
+        .attr("r", function(d) {return size(d);});
+}
+
+var svg = d3.select("#map")
+            .append("svg")
+            .attr("width", 606)
+            .attr("height", 601.5)
+            .append("g")
+            .style("border", "1px solid black");
+
+var img = svg.selectAll("image").data([0]);
+    img.enter()
+        .append("svg:image")
+        .attr("xlink:href", "map.jpg")
+        .attr("x", "0")
+        .attr("y", "0")
+        .attr("width", "606")
+        .attr("height", "601.5");
+		
+	var width = 650,
+		barHeight = 20;
+
+	var m = [70, 10, 10, 130],
+		w = width - m[1] - m[3],
+		h = 500 - m[0] - m[2];
+	
+	var chart_svg = d3.select("#chart")
+			.append("svg")
+			.attr("width", w + m[1] + m[3])
+			.attr("height", h + m[0] + m[2])
+			.append("g")
+			.attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+		
+
+	function refreshGraph()
+	{	
+		 var size = d3.scale.linear()
+    .range([3, 20])
+    .domain([0, d3.max(attractionCounter)]);
+
+  var colours = ['#00FF00', '#12FF00', '#24FF00',
+     '#47FF00', '#58FF00' , '#6AFF00' ,
+     '#7CFF00', '#8DFF00' , '#9FFF00' ,
+     '#B0FF00', '#C2FF00' , '#D4FF00' ,
+     '#E5FF00', '#F7FF00' , '#FFF600' ,
+     '#FFE400', '#FFD300' , '#FFC100' ,
+     '#FFAF00', '#FF9E00' , '#FF8C00' ,
+     '#FF7B00', '#FF6900' , '#FF5700' ,
+     '#FF4600', '#FF3400' , '#FF2300' ,
+     '#FF1100', '#FF0000' , '#FF0000' ,
+     '#FF0000'];
+
+  var heatmapColour = d3.scale.linear()
+  .domain(d3.range(0, 1, 1.0 / (colours.length - 1)))
+  .range(colours);
+
+  var c = d3.scale.linear().domain(d3.extent(attractionCounter)).range([0,1]);
+
+	
+		chart_svg.selectAll("g").remove();
+		chart_svg.selectAll("text").remove();
+		
+		var format = d3.format(",.0f");
+
+		var x = d3.scale.linear().range([0, w]),
+			y = d3.scale.ordinal().rangeRoundBands([0, h], .1);
+
+		var xAxis = d3.svg.axis().scale(x).orient("top").tickSize(-h),
+			yAxis = d3.svg.axis().scale(y).orient("left").tickSize(0);
+		
+		var data = [["name","value"]];
+		
+		
+		//Skapa någon form av sorteringshatt här!
+		
+		
+		for(var i = 0; i < attractions.length; i++)
+		{
+			var tmp = [attractions[i][3], attractionCounter[i]];
+			data.push(tmp);
+		}
+				
+		data = convertToArrayOfObjects(data);
+		function convertToArrayOfObjects(data) 
+		{
+			var keys = data.shift(),
+				i = 0, k = 0,
+				obj = null,
+				output = [];
+				
+			for (i = 0; i < data.length; i++) 
+			{
+				obj = {};
+				for (k = 0; k < keys.length; k++) 
+				{
+					obj[keys[k]] = data[i][k];
+				}
+				output.push(obj);
+			}
+			return output;
+		}
+		
+		for(var i = 0; i < data.length-1; i++)
+		{
+			for(var j = i+1; j < data.length; j++)
+			{
+				if(data[i].value < data[j].value)
+				{
+					var temp = data[j];
+					data[j] = data[i];
+					data[i] = temp;
+				}
+			}
+		}
+		
+		// Set the scale domain.
+		x.domain([0, d3.max(data, function(d) { return d.value; })]);
+		y.domain(data.map(function(d) { return d.name; }));		
+
+		var bar = chart_svg.selectAll("g.bar")
+			.data(data)
+			.enter().append("g")
+				.attr("class", "bar")
+				.attr("transform", function(d) { return "translate(0," + y(d.name) + ")"; });
+
+		bar.append("rect")
+			.attr("width", function(d) { return x(d.value); })
+			.attr("height", y.rangeBand())
+			.attr("fill", function(d) { return heatmapColour(c(d.value)) });
+			//.attr("fill", "red");
+
+		chart_svg.append("g")
+			.attr("class", "x axis")
+			.call(xAxis);
+
+		chart_svg.append("g")
+			.attr("class", "y axis")
+			.call(yAxis);
+		
+		chart_svg.append("text")
+            .attr("text-anchor", "middle") 
+            .attr("transform", "translate("+ ((width/2)-100) +","+(-20)+")")  
+            .text("Visitors");		
+	}
+	
+d3.select('#sliderTime').call(d3.slider().axis(d3.svg.axis().orient("bottom")).min(8).max(23).step(1).on("slide", function(evt, value) 
+{
+      d3.select('#timeMin').text(value + ":00 - " + value + ":59");
+      switch(value)
+      {
+        case 8: loadCSV("data/friday/8.csv");
+                break;
+
+        case 9: loadCSV("data/friday/9.csv");
+                break;
+
+        case 10: loadCSV("data/friday/10.csv");
+                break;
+
+        case 11: loadCSV("data/friday/11.csv");
+                break;
+
+        case 12: loadCSV("data/friday/12.csv");
+                break;
+
+        case 13: loadCSV("data/friday/13.csv");
+                break;
+
+        case 14: loadCSV("data/friday/14.csv");
+                break;
+
+        case 15:loadCSV("data/friday/15.csv");
+                break;
+
+        case 16:loadCSV("data/friday/16.csv");
+                break;
+
+        case 17:loadCSV("data/friday/17.csv");
+                break;
+
+        case 18:loadCSV("data/friday/18.csv");
+                break;
+
+        case 19:loadCSV("data/friday/19.csv");
+                break;
+
+        case 20:loadCSV("data/friday/20.csv");
+                break;
+
+        case 21:loadCSV("data/friday/21.csv");
+                break;
+
+        case 22:loadCSV("data/friday/22.csv");
+                break;
+
+        case 23: loadCSV("data/friday/23.csv");
+                break;
+
+        default: console.log("Error");
+                break;
+      }	
+}
+))
+</script>
+</body>
